@@ -22,20 +22,27 @@ handler.handleReqRes = (req, res) => {
     }
     const choosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler
 
-    choosenHandler(requestedProperties, (statusCode, payload) => {
-        const status = typeof statusCode === 'number' ? statusCode : 500
-        const payloadData = typeof payload === 'object' ? payload : {}
-        const payLoadString = JSON.stringify(payloadData)
-        res.writeHead(statusCode)
-        res.end(payLoadString)
-    })
+    // choosenHandler(requestedProperties, (statusCode, payload) => {
+    //     const status = typeof statusCode === 'number' ? statusCode : 500
+    //     const payloadData = typeof payload === 'object' ? payload : {}
+    //     const payLoadString = JSON.stringify(payloadData)
+    //     res.writeHead(statusCode)
+    //     res.end(payLoadString)
+    // })
     req.on('data', (buffer) => {
         realData += decoder.write(buffer)
     })
     req.on('end', () => {
         realData += decoder.end()
-        console.log(realData);
-        res.end('Uptime API Monitoring Projects is Running')
+        choosenHandler(requestedProperties, (statusCode, payload) => {
+            const status = typeof statusCode === 'number' ? statusCode : 500
+            const payloadData = typeof payload === 'object' ? payload : {}
+            const payLoadString = JSON.stringify(payloadData)
+            res.writeHead(statusCode)
+            res.end(payLoadString)
+        })
+        // console.log(realData);
+        // res.end('Uptime API Monitoring Projects is Running')
     })
 }
 module.exports = handler
