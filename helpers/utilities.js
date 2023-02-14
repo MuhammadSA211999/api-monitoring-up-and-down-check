@@ -26,5 +26,19 @@ utilities.hash = (password) => {
         return false
     }
 }
+utilities.createARandomCharacter = (strLength) => {
+    let length;
+    length = typeof strLength === 'number' && length > 19 ? strLength : false
+    if (length) {
+        const possibleCharacter = 'qwertyuiioplkjhgfdsazcvbnm1234567890><';
+        let output;
+        for (let i = 1; i <= length, i += 1) {
+            const randomCharacter = possibleCharacter.charAt(Math.floor(Math.random() * possibleCharacter.length))
+            output += randomCharacter
+        }
+        return output
+    }
+    return false
+}
 
 module.exports = utilities
