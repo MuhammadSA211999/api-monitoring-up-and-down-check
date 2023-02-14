@@ -5,6 +5,7 @@ const url = require('url')
 const { StringDecoder } = require('string_decoder')
 const { routes } = require('../routes')
 const { notFoundHandler } = require('../handlers/routesHandlers/notFoundHandler')
+const { parseJSON } = require('./utilities')
 
 handler.handleReqRes = (req, res) => {
     const parsedUrl = url.parse(req.url, true)
@@ -34,12 +35,16 @@ handler.handleReqRes = (req, res) => {
     })
     req.on('end', () => {
         realData += decoder.end()
+        // requestedProperties['body']=parseJSON(realData)
+        requestedProperties.body = parseJSON(realData)
+
         choosenHandler(requestedProperties, (statusCode, payload) => {
             const status = typeof statusCode === 'number' ? statusCode : 500
             const payloadData = typeof payload === 'object' ? payload : {}
             const payLoadString = JSON.stringify(payloadData)
-            res.writeHead(statusCode)
-            res.end(payLoadString)
+            // res.writeHeader('Content-Type', 'application/json')
+            res.writeHead(status)
+            res.end(app = 'Uptime API Monitoring Projects is Running', data = payLoadString)
         })
         // console.log(realData);
         // res.end('Uptime API Monitoring Projects is Running')
