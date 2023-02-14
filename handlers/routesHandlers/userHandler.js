@@ -1,5 +1,5 @@
 // dependecies
-const { hash } = require("../../helpers/utilities")
+const { hash, parseJSON } = require("../../helpers/utilities")
 const data = require("../../lib/data")
 
 const handler = {}
@@ -21,7 +21,21 @@ handlers.users = {}
 handlers.users.get = (requestedProperties, callback) = {
     const phone = typeof (requestedProperties.body.phone) === 'string' && requestedProperties.body.phone.trim().length === 11 ? requestedProperties.body.phone : false   
     if(phone) {
+        data.read('users', phone, (err1, user) => {
+            if (!err1 && user) {
+                const u = { ...parseJSON(user) }
+                delete u.password
+                callback(200, {
 
+                    message: `Your user is => ${u}`
+                })
+            }
+            else {
+                callback(500, {
+                    error: 'could not found the user'
+                })
+            }
+        })
     }
     else{
         callback(400, {
@@ -31,7 +45,6 @@ handlers.users.get = (requestedProperties, callback) = {
 
 }
 handler.users.post = (requestedProperties, callback) = {
-
     const firstName = typeof (requestedProperties.body.firstName) === 'string' && requestedProperties.body.firstName.trim().length > 0 ? requestedProperties.body.firstName : false
    const lastName = typeof (requestedProperties.body.lastName) === 'string' && requestedProperties.body.lastName.trim().length > 0 ? requestedProperties.body.lastName : false
    const phone = typeof (requestedProperties.body.phone) === 'string' && requestedProperties.body.phone.trim().length === 11 ? requestedProperties.body.phone : false
@@ -73,10 +86,85 @@ handler.users.post = (requestedProperties, callback) = {
 }
 };
 
-// handlers._user.put = (requestedProperties, callback) = {
+handlers._user.put = (requestedProperties, callback) = {
+    const firstName = typeof (requestedProperties.body.firstName) === 'string' && requestedProperties.body.firstName.trim().length > 0 ? requestedProperties.body.firstName : false
+   const lastName = typeof (requestedProperties.body.lastName) === 'string' && requestedProperties.body.lastName.trim().length > 0 ? requestedProperties.body.lastName : false
+   const phone = typeof (requestedProperties.body.phone) === 'string' && requestedProperties.body.phone.trim().length === 11 ? requestedProperties.body.phone : false
+   const password = typeof (requestedProperties.body.password) === 'string' && requestedProperties.body.password.trim().length === 11 ? requestedProperties.body.password : false
 
-// }
-// handlers._user.delete = (requestedProperties, callback) = {
+   if(phone) {
+        if (firstName || lastName || password) {
+            data.read('users', phone, (err1, userData) => {
+                if (!err1 && userData) {
+                    const user = { ...parseJSON(userData) }
+                    if (firstName) {
+                        user.firstName = firstName
+                    }
+                    if (lastName) {
+                        user.lastName = lastName
+                    }
+                    if (password) {
+                        user.password = hash(password)
+                    }
+                    data.update('users', phone, user, (err) => {
+                        if (!err) {
+                            callback(200, {
+                                message: 'successfully updated'
+                            })
+                        }
+                        else {
+                            callback(400, {
+                                error: 'server side error'
+                            })
+                        }
+                    })
+                }
+                else {
 
-// }
+                }
+            })
+        }
+        else {
+            callback(400, {
+                error: 'Nothing to changed'
+            })
+        }
+    }
+   else{
+        callback(400, {
+            error:'Request in your problem'
+    })
+    }
+}
+handlers._user.delete = (requestedProperties, callback) = {
+    const phone = typeof (requestedProperties.queryStringObj.phone) === 'string' && requestedProperties.queryStringObj.phone.trim().length === 11 ? requestedProperties.queryStringObj.phone : false
+    if(phone) {
+        data.read('users', phone, (err, user) => {
+            if (!err && user) {
+                data.delete('users', phone, (err2) => {
+                    if (!err2) {
+                        callback(200, {
+                            message: 'data deleted successfully'
+                        })
+                    }
+                    else {
+                        callback(404, {
+                            error: 'problem to yor request'
+                        })
+                    }
+                })
+            }
+            else {
+                callback(404, {
+                    error: 'problem to yor request'
+                })
+            }
+        })
+    }
+    else{
+        callback(404, {
+            error:'problem to yor request'
+        })
+    }
+}
 module.exports = handler
