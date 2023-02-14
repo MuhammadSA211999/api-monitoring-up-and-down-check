@@ -69,7 +69,22 @@ handler.tokens.post = (requestedProperties, callback) = {
 };
 
 handlers.tokens.put = (requestedProperties, callback) = {
-
+    const id = typeof requestedProperties.queryStringObj.id === 'string' && requestedProperties.queryStringObj.id.length === 20 ? requestedProperties.queryStringObj.id : false 
+   if(id) {
+        data.read('tokens', id, (err, token) => {
+            if (!err && token) {
+                const tokenObj = { ...parseJSON(token) }
+                callback(200, {
+                    message: `Your token is ${tokenObj}`
+                })
+            }
+            else {
+                callback(500, {
+                    message: `Your token can not found`
+                })
+            }
+        })
+    }
 }
 handlers.tokens.delete = (requestedProperties, callback) = {
 
