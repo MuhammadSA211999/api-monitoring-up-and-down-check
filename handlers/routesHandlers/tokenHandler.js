@@ -34,9 +34,24 @@ handler.tokens.post = (requestedProperties, callback) = {
                 const tokenId = createARandomCharacter(20)
                 const expires = Date.now() + 60 * 60 * 1000
                 const tokenObj = {
-                    hashPass, tokenId, expires
+                    hashPass, id: tokenId, expires
                 }
+                data.create('tokens', tokenId, tokenObj, (err) => {
+                    if (!err) {
+                        callback(200, {
+                            message: 'token created successfully'
+                        })
+                    }
+                    else {
+                        callback(500, {
+                            message: 'could not create token'
+                        })
+                    }
+                })
 
+            }
+            else {
+                return false
             }
         }
         else {
