@@ -23,7 +23,8 @@ handlers.tokens.get = (requestedProperties, callback) = {
 
 }
 handler.tokens.post = (requestedProperties, callback) = {
-
+    const phone = typeof requestedProperties.body.phone === 'string' && requestedProperties.body.phone.trim().length === 20 ? requestedProperties.body.phone : false
+    const password = typeof requestedProperties.body.password === 'string' && requestedProperties.body.password.trim().length > 0 ? requestedProperties.body.password : false
 };
 
 handlers.tokens.put = (requestedProperties, callback) = {
