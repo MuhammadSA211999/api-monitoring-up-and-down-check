@@ -156,6 +156,19 @@ handlers._check.get = (requestedProperties, callback) = {
 }
 handlers._check.put = (requestedProperties, callback) = {
 
+    const id = typeof (requestedProperties.queryStringObject.id) === 'string' && requestedProperties.queryStringObject.id.length === 20 ? requestedProperties.queryStringObject.id : false 
+
+    const protocol = typeof (requestedProperties.body.protocol) === 'string' && ['http', 'https'].indexOf(requestedProperties.body.protocol) > -1 ? requestedProperties.body.protocol : false
+    
+    const url = typeof (requestedProperties.body.url) === 'string' && requestedProperties.body.url.length > 1 ? requestedProperties.body.url : false 
+
+    const method = typeof (requestedProperties.body.method) === 'string' && ['get', 'post', 'put', 'delete'].indexOf(requestedProperties.body.method) > -1 ? requestedProperties.body.method : false
+    
+    const successCode = typeof (requestedProperties.body.successCode) === 'object' && requestedProperties.body.successCode instanceof Array ? requestedProperties.body.successCode : false
+
+    const timeoutSec = typeof (requestedProperties.body.time) === 'number' && requestedProperties.body.time >= 1 && requestedProperties.body.time <= 5 && requestedProperties.body.time % 1 === 0 ? requestedProperties.body.time : false
+
+
 }
 handlers._check.delete = (requestedProperties, callback) = {
 
