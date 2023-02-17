@@ -168,7 +168,43 @@ handlers._check.put = (requestedProperties, callback) = {
 
     const timeoutSec = typeof (requestedProperties.body.time) === 'number' && requestedProperties.body.time >= 1 && requestedProperties.body.time <= 5 && requestedProperties.body.time % 1 === 0 ? requestedProperties.body.time : false
 
+    if(id) {
+        if (protocol || url || method || timeoutSec || successCode) {
 
+            const tokenId = typeof (requestedProperties.headersObj.token) === 'string' && requestedProperties.headersObj.token.length === 20 ? requestedProperties.headersObj.token 
+        
+        data.read('cheaks', id, (err1, checkData) => {
+                if (!err1 && checkData) {
+                    const cheackObj = parseJSON(checkData)
+                    tokenHandler._token.verif(tokenId, checkObj.phone, (isValid) => {
+                        if (isValid) {
+                            if (protocol) {
+                                cheackObj.protocol = protocol
+                            }
+                        }
+                        else {
+                            callback(403, {
+                                error: 'unauthorized request'
+                            })
+                        }
+                    })
+                }
+                else {
+
+                }
+            })
+        }
+        else {
+            callback(400, {
+                error: 'You have request to your problem'
+            })
+        }
+    }
+    else{
+        callback(400, {
+            error:'You have request to your problem'
+        })
+    }
 }
 handlers._check.delete = (requestedProperties, callback) = {
 
