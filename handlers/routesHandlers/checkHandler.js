@@ -193,7 +193,18 @@ handlers._check.put = (requestedProperties, callback) = {
                             if (timeoutSec) {
                                 cheackObj.timeoutSec = timeoutSec
                             }
-                            data.update('checks', id, tokenObj, (err4) => { })
+                            data.update('checks', id, tokenObj, (err4) => {
+                                if (!err4) {
+                                    callback(200, {
+                                        message: 'successfully update the cheack'
+                                    })
+                                }
+                                else {
+                                    callback(500, {
+                                        error: 'could not update the cheack'
+                                    })
+                                }
+                            })
                         }
                         else {
                             callback(403, {
