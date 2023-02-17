@@ -19,7 +19,22 @@ handler.userHandler = (requestedProperties, callback) => {
 const handlers = {}
 handlers.tokens = {}
 handlers.tokens.get = (requestedProperties, callback) = {
-
+    const id = typeof requestedProperties.queryStringObj.id === 'string' && requestedProperties.queryStringObj.id.length === 20 ? requestedProperties.queryStringObj.id : false 
+    if(id) {
+        data.read('tokens', id, (err, token) => {
+            if (!err && token) {
+                const tokenObj = { ...parseJSON(token) }
+                callback(200, {
+                    message: `Your token is ${tokenObj}`
+                })
+            }
+            else {
+                callback(500, {
+                    message: `Your token can not found`
+                })
+            }
+        })
+    }
 
 }
 handler.tokens.post = (requestedProperties, callback) = {
@@ -69,24 +84,75 @@ handler.tokens.post = (requestedProperties, callback) = {
 };
 
 handlers.tokens.put = (requestedProperties, callback) = {
-    const id = typeof requestedProperties.queryStringObj.id === 'string' && requestedProperties.queryStringObj.id.length === 20 ? requestedProperties.queryStringObj.id : false 
-   if(id) {
-        data.read('tokens', id, (err, token) => {
-            if (!err && token) {
-                const tokenObj = { ...parseJSON(token) }
+    const id = typeof requestedProperties.body.id === 'string' && requestedProperties.body.id.trim().length === 20 ? requestedProperties.body.id : false
+   const extend = typeof requestedProperties.body.extend === 'boolean' && requestedProperties.body.id === 'true' ? true : false
+
+   if(id&& extend) {
+    data.read('tokens', id, (err1, token) => {
+        if (!err1) {
+            const tokenObj = { ...parseJSON(token) }
+            //    const expires=tokenObj.expires<Date.now()?true:false
+            if (tokenObj.expires > Date.now()) {
+                // tokenObj.expires>Date.now() mean token have time, extend the time
+                tokenObj.expires = Date.now() + 60 * 60 * 1000
+                data.update('tokens', id, tokenObj, (err2) => {
+                    if (!err2) {
+                        callback(200, {
+                            message: 'successfully update the token'
+                        })
+                    }
+                    else {
+                        callback(500, {
+                            error: 'error occured to update the token'
+                        })
+                    }
+                })
+            }
+            else {
+
+            }
+        }
+        else {
+
+        }
+    })
+}
+   else {
+
+}
+}
+handlers.tokens.delete = (requestedProperties, callback) = {
+    const id = typeof requestedProperties.body.id === 'string' && requestedProperties.body.id.trim().length === 20 ? requestedProperties.body.id : false   
+    if(id) {
+        data.delete('tokens', id, (err) => {
+            if (!err) {
                 callback(200, {
-                    message: `Your token is ${tokenObj}`
+                    message: 'deleted the token successfully'
                 })
             }
             else {
                 callback(500, {
-                    message: `Your token can not found`
+                    message: 'error occured to deleted the token'
                 })
             }
         })
     }
 }
-handlers.tokens.delete = (requestedProperties, callback) = {
+handler._token.verify = (id, phone, callback) => {
+    data.read('tokens', id, (err1, token) => {
+        if (!err && token) {
+            const tokenObj = { ...parseJSON(token) }
+            if (tokenObj.phone === phone && tokenObj.expires > Date.now()) {
+                callback(true)
+            }
+            else {
+                callback(false)
+            }
+        }
+        else {
+            callback(false)
+        }
 
+    })
 }
 module.exports = handler

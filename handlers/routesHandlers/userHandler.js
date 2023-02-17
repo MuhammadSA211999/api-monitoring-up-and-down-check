@@ -1,7 +1,7 @@
 // dependecies
 const { hash, parseJSON } = require("../../helpers/utilities")
 const data = require("../../lib/data")
-
+const toke = require('./tokenHandler')
 const handler = {}
 handler.userHandler = (requestedProperties, callback) => {
     const acceptedMethods = ['post', 'get', 'put', 'delete']
@@ -21,27 +21,33 @@ handlers.users = {}
 handlers.users.get = (requestedProperties, callback) = {
     const phone = typeof (requestedProperties.body.phone) === 'string' && requestedProperties.body.phone.trim().length === 11 ? requestedProperties.body.phone : false   
     if(phone) {
-        data.read('users', phone, (err1, user) => {
-            if (!err1 && user) {
-                const u = { ...parseJSON(user) }
-                delete u.password
-                callback(200, {
+        const tokenId = requestedProperties.headersObj.token === 'string'
+        tokenHandler._token.verify(tokenId, phone, (isVerify > {
+            if(isVerify) {
+                data.read('users', phone, (err1, user) => {
+                    if (!err1 && user) {
+                        const u = { ...parseJSON(user) }
+                        delete u.password
+                        callback(200, {
 
-                    message: `Your user is => ${u}`
+                            message: `Your user is => ${u}`
+                        })
+                    }
+                    else {
+                        callback(500, {
+                            error: 'could not found the user'
+                        })
+                    }
                 })
             }
-            else {
-                callback(500, {
-                    error: 'could not found the user'
+            else{
+                callback(400, {
+                    error:'request is not valid'
                 })
             }
-        })
-    }
-    else{
-        callback(400, {
-            error:'request is not valid'
-        })
-    }
+        }
+        }
+
 
 }
 handler.users.post = (requestedProperties, callback) = {
