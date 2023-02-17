@@ -119,13 +119,45 @@ handlers._check.post = (requestedProperties, callback) = {
 }
 }
 
-handlers._user.get = (requestedProperties, callback) = {
+handlers._check.get = (requestedProperties, callback) = {
+    const id = typeof (requestedProperties.queryStringObject.id) === 'string' && requestedProperties.queryStringObject.id.length === 20 ? requestedProperties.queryStringObject.id : false  
+    if(id) {
+        data.read('checks', id, (err1, check) => {
+            if (!err1 && checkData) {
+                const checkObj = parseJSON(checkData)
+                const tokenId = typeof (requestedProperties.headersObj.token) === 'string' && requestedProperties.headersObj.token.length === 20 ? requestedProperties.headersObj.token : false
+                if (tokenId) {
+                    tokenHandler._token.verify(tokenId, checkObj.phone, (isValid) => {
+                        if (isValid) {
+                            callback(200, { checkObj: checkObj })
+                        }
+                        else {
+                            callback(500, {
+                                error: 'server side error'
+                            })
+                        }
+                    })
+                }
+                else {
+
+                }
+            }
+            else {
+                callback(404, {
+                    error: 'could not found the check'
+                })
+            }
+        })
+    }
+    else{
+
+    }
 
 }
-handlers._user.put = (requestedProperties, callback) = {
+handlers._check.put = (requestedProperties, callback) = {
 
 }
-handlers._user.delete = (requestedProperties, callback) = {
+handlers._check.delete = (requestedProperties, callback) = {
 
 }
 module.exports = handler
