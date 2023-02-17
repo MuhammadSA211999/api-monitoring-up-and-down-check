@@ -245,10 +245,31 @@ handlers._check.delete = (requestedProperties, callback) = {
                                     data.read('users', checkObj.phone, (err4, userData) => {
                                         if (!err4 && userData) {
                                             const user = parseJSON(userData)
-
+                                            const checkPosition = user.cheks.indexOf(id)
+                                            if (checkPosition > -1) {
+                                                user.cheks.splice(checkPosition, 1)
+                                                // update the user checks field 
+                                                data.update('users', user.phone, user, (err5) => {
+                                                    if (!err5) {
+                                                        callback(200, { user: user })
+                                                    }
+                                                    else {
+                                                        callback(500, {
+                                                            error: 'coulnot delete'
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                            else {
+                                                callback(500, {
+                                                    error: 'coulnot find the id'
+                                                })
+                                            }
                                         }
                                         else {
-
+                                            callback(500, {
+                                                error: 'coulnot delete'
+                                            })
                                         }
                                     })
                                 }
