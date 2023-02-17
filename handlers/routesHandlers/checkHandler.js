@@ -181,6 +181,19 @@ handlers._check.put = (requestedProperties, callback) = {
                             if (protocol) {
                                 cheackObj.protocol = protocol
                             }
+                            if (url) {
+                                cheackObj.url = url
+                            }
+                            if (successCode) {
+                                cheackObj.successCode = successCode
+                            }
+                            if (method) {
+                                cheackObj.method = method
+                            }
+                            if (timeoutSec) {
+                                cheackObj.timeoutSec = timeoutSec
+                            }
+                            data.update('checks', id, tokenObj, (err4) => { })
                         }
                         else {
                             callback(403, {
