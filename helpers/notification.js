@@ -17,9 +17,26 @@ notification.sendTwilioSMS = (phone, msg, callback) => {
             path: `${twilio.accountSid}`,
             auth: `${twilio.authToken}`,
             headers: {
-                'Content-Type': 'x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
+        const req = https.request(requestDetails, (res) => {
+            const status = res.statusCode
+            if (status === 200 || status === 201) {
+                callback(false)
+            }
+            else {
+                callback('Status code returned the process')
+            }
+        })
+
+        req.on('error', (e) => {
+            callback(e)
+        })
+
+        req.write(payloadString)
+        req.end()
+
     }
     else {
         callback('Something missing in your request')
