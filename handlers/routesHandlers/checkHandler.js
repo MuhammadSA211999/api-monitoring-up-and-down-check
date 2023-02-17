@@ -231,6 +231,55 @@ handlers._check.put = (requestedProperties, callback) = {
     }
 }
 handlers._check.delete = (requestedProperties, callback) = {
+    const id = typeof (requestedProperties.queryStringObject.id) === 'string' && requestedProperties.queryStringObject.id.length === 20 ? requestedProperties.queryStringObject.id : false  
+    if(id) {
+        data.read('checks', id, (err1, check) => {
+            if (!err1 && checkData) {
+                const checkObj = parseJSON(checkData)
+                const tokenId = typeof (requestedProperties.headersObj.token) === 'string' && requestedProperties.headersObj.token.length === 20 ? requestedProperties.headersObj.token : false
+                if (tokenId) {
+                    tokenHandler._token.verify(tokenId, checkObj.phone, (isValid) => {
+                        if (isValid) {
+                            data.delete('checks', id, (err3) => {
+                                if (!err3) {
+                                    data.read('users', checkObj.phone, (err4, userData) => {
+                                        if (!err4 && userData) {
+                                            const user = parseJSON(userData)
+
+                                        }
+                                        else {
+
+                                        }
+                                    })
+                                }
+                                else {
+                                    callback(500, {
+                                        error: 'coulnot delete'
+                                    })
+                                }
+                            })
+                        }
+                        else {
+                            callback(500, {
+                                error: 'server side error'
+                            })
+                        }
+                    })
+                }
+                else {
+
+                }
+            }
+            else {
+                callback(404, {
+                    error: 'could not found the check'
+                })
+            }
+        })
+    }
+    else{
+
+    }
 
 }
 module.exports = handler
